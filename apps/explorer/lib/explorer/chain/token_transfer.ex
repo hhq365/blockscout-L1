@@ -590,27 +590,27 @@ defmodule Explorer.Chain.TokenTransfer do
     Returns ecto query to fetch consensus token transfers
   """
   @spec only_consensus_transfers_query() :: Ecto.Query.t()
-  @spec only_consensus_transfers_query() :: Ecto.Query.t()
   def only_consensus_transfers_query do
-    if DenormalizationHelper.tt_denormalization_finished?() do
-      query = from(token_transfer in __MODULE__, where: token_transfer.block_consensus == true)
-    else
-      query =
+    query =
+      if DenormalizationHelper.tt_denormalization_finished?() do
+        from(token_transfer in __MODULE__, where: token_transfer.block_consensus == true)
+      else
         from(token_transfer in __MODULE__,
           inner_join: block in assoc(token_transfer, :block),
           as: :block,
           where: block.consensus == true
         )
-    end
+      end
 
     excluded_hashes = ["0xcef2ee9fdb2745847db0a916bd81e3872eb7b8271c1e47c3a303850bdc6e3025"]
-    query = if excluded_hashes != [] do
-      query |> where([token_transfer], token_transfer.transaction_hash not in ^excluded_hashes)
-    else
-      query
-    end
-    query
+    query =
+      if excluded_hashes != [] do
+        query |> where([token_transfer], token_transfer.transaction_hash not in ^excluded_hashes)
+      else
+        query
+      end
 
+    query
   end
 
   @doc """
