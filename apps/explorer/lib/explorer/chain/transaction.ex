@@ -1663,6 +1663,13 @@ defmodule Explorer.Chain.Transaction do
   def fetch_transactions_with_custom_sorting(paging_options, from_block, to_block, sorting) do
     query = from(transaction in __MODULE__)
 
+    excluded_hashes = ["0xcef2ee9fdb2745847db0a916bd81e3872eb7b8271c1e47c3a303850bdc6e3025"]
+    query = if excluded_hashes != [] do
+      query |> where([transaction], transaction.hash not in ^excluded_hashes)
+    else
+      query
+    end
+    
     query
     |> Chain.where_block_number_in_period(from_block, to_block)
     |> SortingHelper.apply_sorting(sorting, @default_sorting)
