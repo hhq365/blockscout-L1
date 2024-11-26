@@ -176,10 +176,13 @@ config :ueberauth, Ueberauth, logout_url: "https://#{System.get_env("ACCOUNT_AUT
 ### Ethereum JSONRPC ###
 ########################
 
+trace_url_missing? = System.get_env("ETHEREUM_JSONRPC_TRACE_URL") in ["", nil]
+
 config :ethereum_jsonrpc,
   rpc_transport: if(System.get_env("ETHEREUM_JSONRPC_TRANSPORT", "http") == "http", do: :http, else: :ipc),
   ipc_path: System.get_env("IPC_PATH"),
-  disable_archive_balances?: ConfigHelper.parse_bool_env_var("ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES"),
+  disable_archive_balances?:
+    trace_url_missing? or ConfigHelper.parse_bool_env_var("ETHEREUM_JSONRPC_DISABLE_ARCHIVE_BALANCES"),
   archive_balances_window: ConfigHelper.parse_integer_env_var("ETHEREUM_JSONRPC_ARCHIVE_BALANCES_WINDOW", 200)
 
 config :ethereum_jsonrpc, EthereumJSONRPC.HTTP,
@@ -535,6 +538,9 @@ config :explorer, Explorer.MicroserviceInterfaces.Metadata,
   service_url: System.get_env("MICROSERVICE_METADATA_URL"),
   enabled: ConfigHelper.parse_bool_env_var("MICROSERVICE_METADATA_ENABLED")
 
+config :explorer, Explorer.SmartContract.StylusVerifierInterface,
+  service_url: ConfigHelper.parse_microservice_url("MICROSERVICE_STYLUS_VERIFIER_URL")
+
 config :explorer, :air_table_public_tags,
   table_url: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_URL"),
   api_key: System.get_env("ACCOUNT_PUBLIC_TAGS_AIRTABLE_API_KEY")
@@ -763,7 +769,7 @@ config :indexer, Indexer.Fetcher.BlockReward.Supervisor,
   disabled?: ConfigHelper.parse_bool_env_var("INDEXER_DISABLE_BLOCK_REWARD_FETCHER")
 
 config :indexer, Indexer.Fetcher.InternalTransaction.Supervisor,
-  disabled?: ConfigHelper.parse_bool_env_var("INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER")
+  disabled?: trace_url_missing? or ConfigHelper.parse_bool_env_var("INDEXER_DISABLE_INTERNAL_TRANSACTIONS_FETCHER")
 
 disable_coin_balances_fetcher? = ConfigHelper.parse_bool_env_var("INDEXER_DISABLE_ADDRESS_COIN_BALANCE_FETCHER")
 
@@ -881,10 +887,14 @@ config :indexer, Indexer.Fetcher.Optimism.WithdrawalEvent.Supervisor, enabled: C
 
 config :indexer, Indexer.Fetcher.Optimism,
   optimism_l1_rpc: System.get_env("INDEXER_OPTIMISM_L1_RPC"),
-  optimism_l1_system_config: System.get_env("INDEXER_OPTIMISM_L1_SYSTEM_CONFIG_CONTRACT")
+  optimism_l1_system_config: System.get_env("INDEXER_OPTIMISM_L1_SYSTEM_CONFIG_CONTRACT"),
+  l1_eth_get_logs_range_size: ConfigHelper.parse_integer_env_var("INDEXER_OPTIMISM_L1_ETH_GET_LOGS_RANGE_SIZE", 250),
+  l2_eth_get_logs_range_size: ConfigHelper.parse_integer_env_var("INDEXER_OPTIMISM_L2_ETH_GET_LOGS_RANGE_SIZE", 250),
+  block_duration: ConfigHelper.parse_integer_env_var("INDEXER_OPTIMISM_BLOCK_DURATION", 2),
+  start_block_l1: ConfigHelper.parse_integer_or_nil_env_var("INDEXER_OPTIMISM_L1_START_BLOCK"),
+  portal: System.get_env("INDEXER_OPTIMISM_L1_PORTAL_CONTRACT")
 
 config :indexer, Indexer.Fetcher.Optimism.Deposit,
-  batch_size: System.get_env("INDEXER_OPTIMISM_L1_DEPOSITS_BATCH_SIZE"),
   transaction_type: ConfigHelper.parse_integer_env_var("INDEXER_OPTIMISM_L1_DEPOSITS_TRANSACTION_TYPE", 126)
 
 config :indexer, Indexer.Fetcher.Optimism.OutputRoot,
@@ -899,7 +909,9 @@ config :indexer, Indexer.Fetcher.Optimism.TransactionBatch,
   blocks_chunk_size: System.get_env("INDEXER_OPTIMISM_L1_BATCH_BLOCKS_CHUNK_SIZE", "4"),
   eip4844_blobs_api_url: System.get_env("INDEXER_OPTIMISM_L1_BATCH_BLOCKSCOUT_BLOBS_API_URL", ""),
   celestia_blobs_api_url: System.get_env("INDEXER_OPTIMISM_L1_BATCH_CELESTIA_BLOBS_API_URL", ""),
-  genesis_block_l2: ConfigHelper.parse_integer_or_nil_env_var("INDEXER_OPTIMISM_L2_BATCH_GENESIS_BLOCK_NUMBER")
+  genesis_block_l2: ConfigHelper.parse_integer_or_nil_env_var("INDEXER_OPTIMISM_L2_BATCH_GENESIS_BLOCK_NUMBER"),
+  inbox: System.get_env("INDEXER_OPTIMISM_L1_BATCH_INBOX"),
+  submitter: System.get_env("INDEXER_OPTIMISM_L1_BATCH_SUBMITTER")
 
 config :indexer, Indexer.Fetcher.Withdrawal.Supervisor,
   disabled?: System.get_env("INDEXER_DISABLE_WITHDRAWALS_FETCHER", "true") == "true"
