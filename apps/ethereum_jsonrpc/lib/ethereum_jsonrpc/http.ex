@@ -28,7 +28,8 @@ defmodule EthereumJSONRPC.HTTP do
     http_options = Keyword.fetch!(options, :http_options)
 
     with {:ok, %{body: body, status_code: code}} <- http.json_rpc(url, json, headers(), http_options),
-         {:ok, json} <- decode_json(request: [url: url, body: json], response: [status_code: code, body: body]),
+         {:ok, json} <-
+           decode_json(request: [url: url, body: json, headers: headers()], response: [status_code: code, body: body]),
          {:ok, response} <- handle_response(json, code) do
       {:ok, response}
     else
@@ -77,7 +78,10 @@ defmodule EthereumJSONRPC.HTTP do
 
       {:ok, %{body: body, status_code: status_code}} ->
         with {:ok, decoded_body} <-
-               decode_json(request: [url: url, body: json], response: [status_code: status_code, body: body]) do
+               decode_json(
+                 request: [url: url, body: json, headers: headers()],
+                 response: [status_code: status_code, body: body]
+               ) do
           chunked_json_rpc(tail, options, [decoded_body | decoded_response_bodies])
         end
 
@@ -240,33 +244,11 @@ defmodule EthereumJSONRPC.HTTP do
     with {:ok, method_to_url} <- Keyword.fetch(options, :method_to_url),
          {:ok, method_atom} <- to_existing_atom(method),
          {:ok, url_type} <- Keyword.fetch(method_to_url, method_atom) do
-      fallback_urls = CommonHelper.url_type_to_urls(url_type, options, :fallback)
-
-      url =
-        url_type
-        |> CommonHelper.url_type_to_urls(options)
-        |> EndpointAvailabilityObserver.maybe_replace_urls(fallback_urls, url_type)
-        |> select_single_url()
-
-      {url_type, url}
+      {url_type, CommonHelper.get_available_url(options, url_type)}
     else
       _ ->
-        url_type = :http
-
-        url =
-          url_type
-          |> CommonHelper.url_type_to_urls(options)
-          |> EndpointAvailabilityObserver.maybe_replace_urls(options[:fallback_urls], url_type)
-          |> select_single_url()
-
-        {url_type, url}
+        {:http, CommonHelper.get_available_url(options, :http)}
     end
-  end
-
-  defp select_single_url([]), do: nil
-
-  defp select_single_url(urls) do
-    Enum.random(urls)
   end
 
   defp to_existing_atom(string) do
