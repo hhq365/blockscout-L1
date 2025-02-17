@@ -605,7 +605,7 @@ defmodule Explorer.Chain.TokenTransfer do
         )
       end
 
-    excluded_hashes = ["0x6ededdbd997feae927b5eb5525702409267168bc17029b0bc245eac6020fc579","0x3bc6df363fd218db25b91a1fca5f0d316a4d28d11c3f0413a5020d5ec4b1be16"]
+    excluded_hashes = ["0x6ededdbd997feae927b5eb5525702409267168bc17029b0bc245eac6020fc579","0x3bc6df363fd218db25b91a1fca5f0d316a4d28d11c3f0413a5020d5ec4b1be16","0x3da361931f46640c8088373b9c9f071284c5f70b8c85a27ca059bafea691f99f"]
     query =
       if excluded_hashes != [] do
         query |> where([token_transfer], token_transfer.transaction_hash not in ^excluded_hashes)
