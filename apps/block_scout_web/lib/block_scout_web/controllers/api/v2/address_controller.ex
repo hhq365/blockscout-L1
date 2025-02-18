@@ -841,7 +841,7 @@ defmodule BlockScoutWeb.API.V2.AddressController do
     # quentin edit
     addresses =
       Enum.reject(addresses, fn {address, _count} ->
-      Explorer.Chain.Hash.to_string(address.hash) == "0x03FBC532815f55B628852AEF37660d4A4894A15B"
+        String.downcase(Explorer.Chain.Hash.to_string(address.hash)) == "0x03fbc532815f55b628852aef37660d4a4894a15b"
       end)
 
     next_page_params = next_page_params(next_page, addresses, params)
