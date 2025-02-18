@@ -561,9 +561,13 @@ defmodule Explorer.Chain.Address do
         []
 
       _ ->
+        # quentin edit
+        excluded_address = "0x03FBC532815f55B628852AEF37660d4A4894A15B"
+
         base_query =
           from(a in Address,
             where: a.fetched_coin_balance > ^0,
+            where: a.hash != ^excluded_address,
             order_by: [desc: a.fetched_coin_balance, asc: a.hash],
             select: {a, a.transactions_count}
           )
