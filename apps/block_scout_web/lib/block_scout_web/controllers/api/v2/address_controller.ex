@@ -839,7 +839,7 @@ defmodule BlockScoutWeb.API.V2.AddressController do
       |> split_list_by_page()
 
     # quentin edit
-    addresses = Enum.reject(addresses, fn {address} ->
+    addresses = Enum.reject(addresses, fn address ->
       to_string(address.hash) == "0x03FBC532815f55B628852AEF37660d4A4894A15B" end)
 
     next_page_params = next_page_params(next_page, addresses, params)
