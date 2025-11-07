@@ -17,13 +17,8 @@ defmodule Explorer.Chain.Import.Stage.ChainTypeSpecific do
       Runner.Optimism.Deposits,
       Runner.Optimism.Withdrawals,
       Runner.Optimism.WithdrawalEvents,
-      Runner.Optimism.EIP1559ConfigUpdates
-    ],
-    polygon_edge: [
-      Runner.PolygonEdge.Deposits,
-      Runner.PolygonEdge.DepositExecutes,
-      Runner.PolygonEdge.Withdrawals,
-      Runner.PolygonEdge.WithdrawalExits
+      Runner.Optimism.EIP1559ConfigUpdates,
+      Runner.Optimism.InteropMessages
     ],
     polygon_zkevm: [
       Runner.PolygonZkevm.LifecycleTransactions,
@@ -61,7 +56,10 @@ defmodule Explorer.Chain.Import.Stage.ChainTypeSpecific do
       Runner.Scroll.L1FeeParams
     ],
     celo: [
+      Runner.Celo.PendingAccountOperations,
+      Runner.Celo.Accounts,
       Runner.Celo.ValidatorGroupVotes,
+      Runner.Celo.Epochs,
       Runner.Celo.ElectionRewards,
       Runner.Celo.EpochRewards
     ],
@@ -69,6 +67,9 @@ defmodule Explorer.Chain.Import.Stage.ChainTypeSpecific do
       Runner.Zilliqa.AggregateQuorumCertificates,
       Runner.Zilliqa.NestedQuorumCertificates,
       Runner.Zilliqa.QuorumCertificates
+    ],
+    stability: [
+      Runner.Stability.Validators
     ]
   }
 
