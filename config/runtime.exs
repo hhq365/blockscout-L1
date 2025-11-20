@@ -839,8 +839,8 @@ config :explorer, Explorer.Migrator.DeleteZeroValueInternalTransactions,
   batch_size: ConfigHelper.parse_integer_env_var("MIGRATION_DELETE_ZERO_VALUE_INTERNAL_TRANSACTIONS_BATCH_SIZE", 100),
   storage_period_days:
     ConfigHelper.parse_integer_env_var("MIGRATION_DELETE_ZERO_VALUE_INTERNAL_TRANSACTIONS_STORAGE_PERIOD_DAYS", 30),
-  future_check_interval:
-    ConfigHelper.parse_time_env_var("MIGRATION_DELETE_ZERO_VALUE_INTERNAL_TRANSACTIONS_FUTURE_CHECK_INTERVAL", "1m")
+  check_interval:
+    ConfigHelper.parse_time_env_var("MIGRATION_DELETE_ZERO_VALUE_INTERNAL_TRANSACTIONS_CHECK_INTERVAL", "1m")
 
 config :explorer, Explorer.Chain.BridgedToken,
   eth_omni_bridge_mediator: System.get_env("BRIDGED_TOKENS_ETH_OMNI_BRIDGE_MEDIATOR"),
@@ -963,6 +963,13 @@ config :indexer, :ipfs,
   gateway_url_param_location:
     ConfigHelper.parse_catalog_value("IPFS_GATEWAY_URL_PARAM_LOCATION", ["query", "header"], true),
   public_gateway_url: System.get_env("IPFS_PUBLIC_GATEWAY_URL", "https://ipfs.io/ipfs")
+
+config :indexer, :arc,
+  arc_native_token_decimals: ConfigHelper.parse_integer_env_var("INDEXER_ARC_NATIVE_TOKEN_DECIMALS", 6),
+  arc_native_token_address:
+    System.get_env("INDEXER_ARC_NATIVE_TOKEN_CONTRACT", "0x3600000000000000000000000000000000000000"),
+  arc_native_token_system_address:
+    System.get_env("INDEXER_ARC_NATIVE_TOKEN_SYSTEM_CONTRACT", "0x1800000000000000000000000000000000000000")
 
 config :indexer, Indexer.Supervisor, enabled: !ConfigHelper.parse_bool_env_var("DISABLE_INDEXER")
 
